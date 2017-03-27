@@ -88,4 +88,32 @@ class ExercisesSepc extends WordSpec with Matchers {
     }
   }
 
+  "AppendFold" should {
+    "correctly append Nil, List(1,2)" in {
+      appendFold(Nil, List(1,2)) shouldBe List(1,2)
+    }
+
+    "correctly append List(1,2), Nil" in {
+      appendFold(List(1,2), Nil) shouldBe List(1,2)
+    }
+
+    "correctly append List(1,2), List(4,3)" in {
+      appendFold(List(1,2), List(4,3)) shouldBe List(1,2,4,3)
+    }
+  }
+
+  "Concatenate" should {
+    "correctly concatenate 2 lists" in {
+      concatenate(List(1,2,3), List(1,2,3)) shouldBe List(1,2,3,1,2,3)
+    }
+
+    "concatenate 1 list" in {
+      concatenate(List(1,2,3)) shouldBe List(1,2,3)
+    }
+
+    "concatenate 3 lists" in {
+      concatenate(List(1,2,3), List(9, 8, 7), List(11, 20, 1)) shouldBe List(1,2,3,9,8,7,11,20,1)
+    }
+  }
+
 }

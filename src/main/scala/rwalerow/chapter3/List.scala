@@ -46,5 +46,12 @@ object List {
     if(as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
 
-  def appendFold[A](as: List[A], toApp: List[A]): List[A]
+
+  // 3.14
+  def appendFold[A](as: List[A], app: List[A]): List[A] =
+    foldRight(as, app)((elem, acc) => Cons(elem, acc))
+
+  // 3.15
+  def concatenate[A](as: List[A]*): List[A] =
+    foldRight(List(as: _*), Nil:List[A])((el, acc) => appendFold(el, acc))
 }
