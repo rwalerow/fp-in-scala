@@ -169,4 +169,10 @@ class ExercisesSepc extends WordSpec with Matchers {
     }
   }
 
+  "Zipwith" should {
+    "work for summing list" in {
+      zipWith(List(1,2,3), List(1,2,3))(_ + _) shouldBe List(2,4,6)
+    }
+  }
+
 }

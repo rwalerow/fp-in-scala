@@ -71,5 +71,12 @@ object List {
   def filter2[A](as: List[A])(f: A => Boolean): List[A] =
     flatMap(as)(a => if(f(a)) List(a) else Nil)
 
-
+  def zipWith[A](as: List[A], sec: List[A])(f: (A, A) => A): List[A] = {
+    def inner(first: List[A], second: List[A])(acc: List[A]): List[A] = (first, second) match {
+      case (Nil, _) => acc
+      case (_, Nil) => acc
+      case (Cons(fh, ft), Cons(sh, st)) => inner(ft, st)(Cons(f(fh,sh), acc))
+    }
+    reverse(inner(as, sec)(Nil:List[A]))
+  }
 }
