@@ -1,7 +1,7 @@
 package rwalerow.chapter3
 
 import org.scalatest.{Matchers, WordSpec}
-import rwalerow.chapter3.Exercieses.{drop, dropWhile, length}
+import rwalerow.chapter3.Exercieses.{addOne, drop, dropWhile, length}
 import rwalerow.chapter3.List._
 
 class ExercisesSepc extends WordSpec with Matchers {
@@ -113,6 +113,16 @@ class ExercisesSepc extends WordSpec with Matchers {
 
     "concatenate 3 lists" in {
       concatenate(List(1,2,3), List(9, 8, 7), List(11, 20, 1)) shouldBe List(1,2,3,9,8,7,11,20,1)
+    }
+  }
+
+  "Add one" should {
+    "handel Nil" in {
+      addOne(Nil) shouldBe Nil
+    }
+
+    "handle regular List" in {
+      addOne(List(5, 2, 1)) shouldBe List(6, 3, 2)
     }
   }
 

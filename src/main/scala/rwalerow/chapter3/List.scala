@@ -49,9 +49,12 @@ object List {
 
   // 3.14
   def appendFold[A](as: List[A], app: List[A]): List[A] =
-    foldRight(as, app)((elem, acc) => Cons(elem, acc))
+    foldRight2(as, app)((elem, acc) => Cons(elem, acc))
 
   // 3.15
   def concatenate[A](as: List[A]*): List[A] =
-    foldRight(List(as: _*), Nil:List[A])((el, acc) => appendFold(el, acc))
+    foldRight2(List(as: _*), Nil:List[A])((el, acc) => appendFold(el, acc))
+
+  def map[A,B](as: List[A])(f: A => B): List[B] =
+    foldRight2(as, Nil:List[B])((el, acc) => Cons(f(el), acc))
 }

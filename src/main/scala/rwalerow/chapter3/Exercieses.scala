@@ -1,6 +1,6 @@
 package rwalerow.chapter3
 
-import rwalerow.chapter3.List.foldRight
+import rwalerow.chapter3.List.{foldRight, foldRight2}
 
 object Exercieses {
 
@@ -32,4 +32,14 @@ object Exercieses {
 
   // 3.9
   def length[A](as: List[A]): Int = foldRight(as, 0)((_, x) => x + 1)
+
+  // 3.16
+  def addOne(as: List[Int]): List[Int] =
+    foldRight2(as, Nil: List[Int])((ele, acc) => Cons(ele + 1, acc))
+
+  // 3.17
+  def stringifyList(as: List[Double]): List[String] =
+    foldRight2(as, Nil:List[String])((ele, acc) => Cons(ele.toString, acc))
+
+
 }
