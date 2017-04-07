@@ -55,6 +55,16 @@ object List {
   def concatenate[A](as: List[A]*): List[A] =
     foldRight2(List(as: _*), Nil:List[A])((el, acc) => appendFold(el, acc))
 
+  // 3.18
   def map[A,B](as: List[A])(f: A => B): List[B] =
     foldRight2(as, Nil:List[B])((el, acc) => Cons(f(el), acc))
+
+  // 3.19
+  def filter[A](as: List[A])(f: A => Boolean): List[A] =
+    foldRight2(as, Nil: List[A])((el, acc) => if(f(el)) Cons(el, acc) else acc)
+
+  // 3.20
+  def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] =
+    foldRight2(as, Nil: List[B])((el, acc) => appendFold(f(el), acc))
+
 }

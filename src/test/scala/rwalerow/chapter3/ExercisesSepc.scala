@@ -126,4 +126,24 @@ class ExercisesSepc extends WordSpec with Matchers {
     }
   }
 
+  "Map" should {
+    "handle to String case" in {
+      val list = List(1,2,3)
+      map(list)(_.toString) shouldBe List("1","2","3")
+    }
+  }
+
+  "Filter" should {
+    "filter out odd numbers" in {
+      filter(List(1,2,3,4,5,6,7,8))(_ % 2 == 0) shouldBe List(2,4,6,8)
+    }
+  }
+
+  "Flatmap" should {
+    "work for i => List(i, i)" in {
+      val list = List(1,2,3)
+      flatMap(list)(i => List(i, i)) shouldBe List(1, 1, 2, 2, 3, 3)
+    }
+  }
+
 }
