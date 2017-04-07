@@ -67,4 +67,9 @@ object List {
   def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] =
     foldRight2(as, Nil: List[B])((el, acc) => appendFold(f(el), acc))
 
+  // 3.21
+  def filter2[A](as: List[A])(f: A => Boolean): List[A] =
+    flatMap(as)(a => if(f(a)) List(a) else Nil)
+
+
 }

@@ -1,7 +1,7 @@
 package rwalerow.chapter3
 
 import org.scalatest.{Matchers, WordSpec}
-import rwalerow.chapter3.Exercieses.{addOne, drop, dropWhile, length}
+import rwalerow.chapter3.Exercieses._
 import rwalerow.chapter3.List._
 
 class ExercisesSepc extends WordSpec with Matchers {
@@ -143,6 +143,29 @@ class ExercisesSepc extends WordSpec with Matchers {
     "work for i => List(i, i)" in {
       val list = List(1,2,3)
       flatMap(list)(i => List(i, i)) shouldBe List(1, 1, 2, 2, 3, 3)
+    }
+  }
+
+  "Filter 2" should {
+    "filter out odd number" in {
+      filter2(List(1,2,3,4,5,6,7,8))(_ % 2 == 0) shouldBe List(2,4,6,8)
+    }
+
+    "work the same as regular filter" in {
+      val l = List(1,2,3,4,5,6,7,8,9)
+      val f = (x: Int) => x == 9
+
+      filter2(l)(f) shouldBe filter(l)(f)
+    }
+  }
+
+  "Add elements" should {
+    "correctly add 2 list of the same size" in {
+      addElements2(List(1,2,3), List(1,2,3)) shouldBe List(2, 4, 6)
+    }
+
+    "converge to shorter list" in {
+      addElements2(List(1,2,3,4), List(2,3)) shouldBe List(3, 5)
     }
   }
 
