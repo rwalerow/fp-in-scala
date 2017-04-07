@@ -1,5 +1,7 @@
 package rwalerow.chapter3
 
+import rwalerow.chapter3.Exercieses.dropWhile
+
 sealed trait List[+A]
 case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
@@ -39,7 +41,7 @@ object List {
   def foldLeft2[A,B](as: List[A], z: B)(f: (B, A) => B): B =
     foldRight(reverse(as), z)((a: A, b: B) => f(b,a))
 
-  def foldRight2[A,B](as: List[A], z: B)(f: (A, B) => B) =
+  def foldRight2[A,B](as: List[A], z: B)(f: (A, B) => B): B =
     foldLeft(reverse(as), z)((b:B, a: A) => f(a, b))
 
   def apply[A](as: A*): List[A] =
@@ -71,12 +73,36 @@ object List {
   def filter2[A](as: List[A])(f: A => Boolean): List[A] =
     flatMap(as)(a => if(f(a)) List(a) else Nil)
 
+  // 3.23
   def zipWith[A](as: List[A], sec: List[A])(f: (A, A) => A): List[A] = {
     def inner(first: List[A], second: List[A])(acc: List[A]): List[A] = (first, second) match {
-      case (Nil, _) => acc
-      case (_, Nil) => acc
+      case (Nil, _)|(_, Nil) => acc
       case (Cons(fh, ft), Cons(sh, st)) => inner(ft, st)(Cons(f(fh,sh), acc))
     }
     reverse(inner(as, sec)(Nil:List[A]))
+  }
+
+  def any[A](as: List[A])(f: A => Boolean): Boolean =
+    foldLeft(as, false)(_ || f(_))
+
+  // 3.24
+  def hasSubseqeunce[A](sup: List[A], sub: List[A]): Boolean = {
+    def isElementinSubHead(head: A): Boolean = sub match {
+      case Nil => false
+      case Cons(h, t) => h == head
+    }
+    def dropIfEqual[A](elem: A)(compList: List[A]): List[A] = compList match {
+      case Nil => Nil
+      case Cons(h, t) if h == elem => t
+      case _ => compList
+    }
+    def inner(list: List[A])(candidates: List[List[A]]): Boolean = list match {
+      case Nil => any(candidates)(_ == Nil)
+      case Cons(headE, tailE) => {
+        if(isElementinSubHead(headE)) inner(tailE)(Cons(Exercieses.tail(sub), map(candidates)(dropIfEqual(headE))))
+        else inner(tailE)(map(candidates)(dropIfEqual(headE)))
+      }
+    }
+    inner(sup)(Nil)
   }
 }

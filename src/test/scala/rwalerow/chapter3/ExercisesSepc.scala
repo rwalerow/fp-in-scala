@@ -175,4 +175,32 @@ class ExercisesSepc extends WordSpec with Matchers {
     }
   }
 
+  "Has sub sequence" should {
+    "mark the same list as true" in {
+      val l = List(1,2,3)
+
+      hasSubseqeunce(l, l) shouldBe true
+    }
+
+    "detect subsequnce from the beginning" in {
+      hasSubseqeunce(List(1,2,3,4), List(1,2,3)) shouldBe true
+    }
+
+    "detect subsequence in the end" in {
+      hasSubseqeunce(List(1,2,3,4,5), List(3,4,5)) shouldBe true
+    }
+
+    "detect spread subsequence" in {
+      val l = List(1,2,3,4,5,6)
+      hasSubseqeunce(l, List(1,3,5)) shouldBe true
+      hasSubseqeunce(l, List(2,4,6)) shouldBe true
+      hasSubseqeunce(l, List(2,3,6)) shouldBe true
+    }
+
+    "not find subsequence" in {
+      hasSubseqeunce(List(1,2,3,4,5), List(5,2)) shouldBe false
+      hasSubseqeunce(List(1,2,3,4,5), List(4,2)) shouldBe false
+     }
+  }
+
 }
