@@ -1,7 +1,5 @@
 package rwalerow.chapter3
 
-import rwalerow.chapter3.Exercieses.dropWhile
-
 sealed trait List[+A]
 case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]

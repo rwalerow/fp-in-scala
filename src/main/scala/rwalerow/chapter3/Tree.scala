@@ -11,5 +11,11 @@ object Tree {
     case Leaf(_) => 1
     case Branch(l, r) => 1 + size(l) + size(r)
   }
+
+  // 3.27
+  def depth[A](tree: Tree[A]): Int = tree match {
+    case Leaf(_) => 1
+    case Branch(l,r) => Math.max(depth(l), depth(r)) + 1
+  }
 }
 
