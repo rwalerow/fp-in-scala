@@ -1,8 +1,19 @@
 package rwalerow.chapter3
 
-import rwalerow.chapter3.List.{foldRight, foldRight2, reverse}
+import rwalerow.chapter3.List.{foldLeft, foldRight, foldRight2, reverse}
 
 object Exercieses {
+
+  def sum(ints: List[Int]): Int = ints match {
+    case Nil => 0
+    case Cons(x, xs) => x + sum(xs)
+  }
+
+  def product(ds: List[Double]): Double = ds match {
+    case Nil => 1.0
+    case Cons(0.0, _) => 0.0
+    case Cons(x, xs) => x * product(xs)
+  }
 
   // 3.2
   def tail[A](list: List[A]): List[A] = list match {
@@ -32,6 +43,10 @@ object Exercieses {
 
   // 3.9
   def length[A](as: List[A]): Int = foldRight(as, 0)((_, x) => x + 1)
+
+  // 3.11
+  def sumLeft(as: List[Int]): Int = foldLeft(as, 0)(_ + _)
+  def productLeft(as: List[Double]): Double = foldLeft(as, 1.0)(_ * _)
 
   // 3.16
   def addOne(as: List[Int]): List[Int] =
