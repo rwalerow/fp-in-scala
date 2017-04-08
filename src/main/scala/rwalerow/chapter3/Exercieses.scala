@@ -57,4 +57,10 @@ object Exercieses {
 
     reverse(inner(f, s)(Nil))
   }
+
+  // 3.26
+  def maximum(tr: Tree[Int]): Int = tr match {
+    case Leaf(x) => x
+    case Branch(l, r) => maximum(l).max(maximum(r))
+  }
 }
