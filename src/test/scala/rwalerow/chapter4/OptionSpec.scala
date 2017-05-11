@@ -64,5 +64,30 @@ class OptionSpec extends WordSpec with Matchers {
       }
 
     }
+    "map2" should {
+      "work fine for both some" in {
+        Option.map2(Some(2), Some(3))(_ + _) shouldBe Some(5)
+      }
+      "return none if first is none" in {
+        Option.map2(None:Option[Int], Some(11))(_ + _) shouldBe None
+      }
+      "return none if second is none" in {
+        Option.map2(Some(10), None:Option[Int])(_ + _) shouldBe None
+      }
+    }
+    "sequence" should {
+      "transform proper list" in  {
+        Option.sequence(List(Some(1), Some(2), Some(3))) shouldBe Some(List(1,2,3))
+      }
+      "return None when None was at the end of list" in {
+        Option.sequence(List(Some(1), Some(2), None)) shouldBe None
+      }
+      "return None when None was at the start of list" in {
+        Option.sequence(List(None, Some(1), Some(2))) shouldBe None
+      }
+      "return None when None was in the middle of list" in {
+        Option.sequence(List(Some(1), None, Some(2))) shouldBe None
+      }
+    }
   }
 }

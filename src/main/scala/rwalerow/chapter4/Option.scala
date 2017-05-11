@@ -23,3 +23,25 @@ case class Some[+A](get: A) extends Option[A] {
   override def orElse[B >: A](default: => Option[B]): Option[B] = this
   override def filter(f: (A) => Boolean): Option[A] = if(f(get)) this else None
 }
+
+object Option {
+  def lift[A, B](f: A => B): Option[A] => Option[B] = _ map f
+  def insuranceRateQuote(age: Int, numberOfSpeedTickets: Int): Double = ???
+  def parseInsuranceRateQuote(age: String, numberOfSeedingTickets: String) = {
+    val optAge = Try(age.toInt)
+    val optTickets = Try(numberOfSeedingTickets.toInt)
+    map2(optAge, optTickets)(insuranceRateQuote)
+  }
+  def Try[A](a: => A): Option[A] = try Some(a) catch { case e: Exception => None }
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = for {
+    aval <- a
+    bval <- b
+  } yield f(aval, bval)
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = a.foldRight(Some(List()): Option[List[A]]){
+    case (None, _) | (_, None) => None
+    case (elementO, accO) => for {
+      acc <- accO
+      element <- elementO
+    } yield element :: acc
+  }
+}
