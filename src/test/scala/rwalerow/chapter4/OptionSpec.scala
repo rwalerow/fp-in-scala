@@ -1,6 +1,7 @@
 package rwalerow.chapter4
 
 import org.scalatest.{Matchers, WordSpec, fixture}
+import rwalerow.chapter4.Option.traverse
 
 class OptionSpec extends WordSpec with Matchers {
 
@@ -87,6 +88,17 @@ class OptionSpec extends WordSpec with Matchers {
       }
       "return None when None was in the middle of list" in {
         Option.sequence(List(Some(1), None, Some(2))) shouldBe None
+      }
+    }
+    "traverse" should {
+      "transform int to strings" in {
+        traverse(List(1,2,3,4))(x =>  Some(x.toString())) shouldBe Some(List("1", "2", "3", "4"))
+      }
+      "traverse should handle None case" in {
+        traverse(List(1,2,3,4)) {
+          case 3 => None
+          case x => Some(x)
+        } shouldBe None
       }
     }
   }
