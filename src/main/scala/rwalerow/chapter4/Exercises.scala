@@ -9,4 +9,9 @@ object Exercises {
     } else None
   }
 
+  def mean(xs: IndexedSeq[Double]): Either[String, Double] =
+    if(xs.isEmpty) Left("Collection is empty")
+    else Right(xs.sum / xs.size)
+
+
 }
