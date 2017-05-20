@@ -48,4 +48,34 @@ class EitherSpec extends WordSpec with Matchers {
     }
   }
 
+  "Either opts" should {
+    "sequence" should {
+
+      "work ok for all ok" in {
+        val a = List(Right(1), Right(2), Right(3))
+        Either.sequence(a) shouldBe Right(List(1,2,3))
+      }
+
+      "crash on first left" in {
+        val a = List(Right(1), Left("1"), Left("2"))
+        Either.sequence(a) shouldBe Left("1")
+      }
+    }
+
+    "traverse" should {
+      "work for all rights" in {
+        val a = List(Right(1), Right(2), Right(3))
+        Either.traverse(a)(e => Right(e + 10)) shouldBe Right(List(11, 12, 13))
+      }
+      "fail for left in list" in {
+        val a = List(Right(1), Left("1"), Right(2))
+        Either.traverse(a)(e => Right(e + 10)) shouldBe Left("1")
+      }
+      "fail for left in function" in {
+        val a = List(Right(1), Right(2), Right(3))
+        Either.traverse(a)(e => if(e == 2) Left("2") else Right(e + 10)) shouldBe Left("2")
+      }
+    }
+  }
+
 }
