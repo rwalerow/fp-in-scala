@@ -4,16 +4,30 @@ trait Stream[+A] {
   def toList: List[A]
   def take(n: Int): Stream[A]
   def takeWhile(p: A => Boolean): Stream[A]
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _ => z
+    }
+  def exists(p: A => Boolean): Boolean =
+    foldRight(false)((a,b) => p(a) || b)
+
+  def forAll(p: A => Boolean): Boolean =
+    foldRight(true)((a,b) => p(a) && b)
 }
+
 case object Empty extends Stream[Nothing] {
   override def toList: List[Nothing] = Nil
-  override def take(n: Int): Stream[Nothing] = this
+  override def take(n: Int): Stream[Nothing] = Empty
   override def takeWhile(p: (Nothing) => Boolean): Stream[Nothing] = this
 }
+
 case class Cons[+A](h: () => A,
                     t: () => Stream[A]) extends Stream[A] {
-  override def toList: List[A] = h() :: t().toList
-  override def take(n: Int): Stream[A] = if(n >= 1) Cons(h, () => t().take(n - 1)) else Empty
+  override def toList: List[A] =
+    h() :: t().toList
+  override def take(n: Int): Stream[A] =
+    if(n >= 1) Cons(h, () => t().take(n - 1)) else Empty
   override def takeWhile(p: (A) => Boolean): Stream[A] = {
     lazy val head = h()
     if(p(head)) Cons(() => head, () => t().takeWhile(p)) else Empty
@@ -41,5 +55,6 @@ object Stream {
     */
   def apply[A](as: A*): Stream[A] =
     if(as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
+
 
 }
