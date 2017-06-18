@@ -1,9 +1,16 @@
 package rwalerow.chapter5
 
+import rwalerow.chapter5.Stream.{cons, empty}
+
 trait Stream[+A] {
   def toList: List[A]
   def take(n: Int): Stream[A]
-  def takeWhile(p: A => Boolean): Stream[A]
+  def takeWhile(p: A => Boolean): Stream[A] =
+    foldRight(empty[A])((a, b) => if (p(a)) cons(a, b) else empty)
+
+  def headOption: Option[A] =
+    foldRight(None: Option[A])((a, _) => Some(a))
+
   def foldRight[B](z: => B)(f: (A, => B) => B): B =
     this match {
       case Cons(h, t) => f(h(), t().foldRight(z)(f))
@@ -19,7 +26,6 @@ trait Stream[+A] {
 case object Empty extends Stream[Nothing] {
   override def toList: List[Nothing] = Nil
   override def take(n: Int): Stream[Nothing] = Empty
-  override def takeWhile(p: (Nothing) => Boolean): Stream[Nothing] = this
 }
 
 case class Cons[+A](h: () => A,
@@ -28,10 +34,6 @@ case class Cons[+A](h: () => A,
     h() :: t().toList
   override def take(n: Int): Stream[A] =
     if(n >= 1) Cons(h, () => t().take(n - 1)) else Empty
-  override def takeWhile(p: (A) => Boolean): Stream[A] = {
-    lazy val head = h()
-    if(p(head)) Cons(() => head, () => t().takeWhile(p)) else Empty
-  }
 }
 
 object Stream {
@@ -55,6 +57,5 @@ object Stream {
     */
   def apply[A](as: A*): Stream[A] =
     if(as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
-
 
 }

@@ -28,18 +28,29 @@ class StreamSpec extends WordSpec with Matchers {
         a.take(1).toList shouldBe List(2)
       }
     }
+
     "takeWhile" should {
       "take only even elements" in {
         val a = Stream(2,4,6,8,11,12)
         a.takeWhile(_ % 2 == 0).toList shouldBe List(2,4,6,8)
       }
     }
+
     "for all" should {
       "work for all" in {
         Stream(2,4,5,6,7).forAll(_ > 0) should be (true)
       }
       "detect false case" in {
         Stream(2,3,4,5,6).forAll(_ != 6) should be (false)
+      }
+    }
+
+    "head option" should {
+      "return some with element" in {
+        Stream(1,2).headOption shouldBe Some(1)
+      }
+      "return emnty" in {
+        Empty.headOption shouldBe None
       }
     }
   }
