@@ -5,6 +5,14 @@ import org.scalatest.{Matchers, WordSpec}
 class StreamSpec extends WordSpec with Matchers {
 
   "Stream" should {
+
+    val streamWithExceptionAt2nd = Cons(() => 2,
+      () => Cons(() => { throw new Exception("sad"); 2},
+        () => Cons(() => 2,
+          () => Cons(() => 2,
+            () => Cons(() => 2,
+              () => Empty)))))
+
     "toList" should {
       "work for empty stream" in {
         val a = Stream(1, 2, 3, 4, 5, 6)
@@ -19,13 +27,7 @@ class StreamSpec extends WordSpec with Matchers {
         taken.last shouldBe 3
       }
       "not call untaken elements" in {
-        val a = Cons(() => 2,
-          () => Cons(() => { throw new Exception("sad"); 2},
-            () => Cons(() => 2,
-              () => Cons(() => 2,
-                () => Cons(() => 2,
-                  () => Empty)))))
-        a.take(1).toList shouldBe List(2)
+        streamWithExceptionAt2nd.take(1).toList shouldBe List(2)
       }
     }
 
@@ -51,6 +53,36 @@ class StreamSpec extends WordSpec with Matchers {
       }
       "return emnty" in {
         Empty.headOption shouldBe None
+      }
+    }
+
+    "map" should {
+      "transform stream into string" in {
+        (Stream(1,2,3,4,5) map (_.toString) toList) shouldBe List("1", "2", "3", "4", "5")
+      }
+      "call should be lazy" in {
+        streamWithExceptionAt2nd map (_.toString)
+      }
+    }
+
+    "filter" should {
+      "filter out all odd elements" in {
+        Stream(1, 2, 3, 4, 5, 6).filter(_ % 2 == 0).toList shouldBe List(2, 4, 6)
+      }
+    }
+
+    "flatMap" should {
+      "transform tranform a stream" in {
+        Stream(1, 2, 3).flatMap(x => Stream(x, x, x)).toList shouldBe List(1,1,1,2,2,2,3,3,3)
+      }
+      "transform with type change" in {
+        Stream(1,2,3,4).flatMap(x => Stream(Array.fill(x)(x.toString): _*)).toList shouldBe List("1", "2", "2", "3", "3", "3", "4", "4", "4", "4")
+      }
+    }
+
+    "append" should {
+      "Add 2 streams" in {
+        Stream(1,2,3).append(Stream(4,5,6)).toList shouldBe List(1,2,3,4,5,6)
       }
     }
   }

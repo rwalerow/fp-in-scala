@@ -21,6 +21,26 @@ trait Stream[+A] {
 
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a,b) => p(a) && b)
+
+  def map[B](f: A => B): Stream[B] = this match {
+    case Empty => Empty
+    case Cons(h, t) => Cons(() => f(h()), () => t() map f)
+  }
+
+  def filter(predicate: A => Boolean): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) => if(predicate(h())) Cons(() => h(), () => t().filter(predicate)) else t().filter(predicate)
+  }
+
+  def append[B >: A](second: Stream[B]): Stream[B] = this match {
+    case Empty => second
+    case Cons(h, t) => Cons(h, () => t().append(second))
+  }
+
+  def flatMap[B](f: A => Stream[B]): Stream[B] = this match {
+    case Empty => Empty
+    case Cons(h, t) => foldRight(Empty: Stream[B])(f(_).append(_))
+  }
 }
 
 case object Empty extends Stream[Nothing] {
