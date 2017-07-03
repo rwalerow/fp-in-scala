@@ -85,6 +85,12 @@ class StreamSpec extends WordSpec with Matchers {
         Stream(1,2,3).append(Stream(4,5,6)).toList shouldBe List(1,2,3,4,5,6)
       }
     }
+
+    "constants" should {
+      "return infinite 2 list" in {
+        Stream.constant(2).take(10).toList.sum shouldBe 20
+      }
+    }
   }
 
 }
