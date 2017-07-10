@@ -3,6 +3,8 @@ package rwalerow.chapter5
 import rwalerow.chapter5.Stream.{cons, empty}
 
 trait Stream[+A] {
+  import Stream._
+
   def toList: List[A]
   def take(n: Int): Stream[A]
   def takeWhile(p: A => Boolean): Stream[A] =
@@ -40,6 +42,38 @@ trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] = this match {
     case Empty => Empty
     case Cons(h, t) => foldRight(Empty: Stream[B])(f(_).append(_))
+  }
+
+  def mapViaFold[B](f: A => B): Stream[B] = unfold(this) {
+    case Cons(head, tail) => Some((f(head()), tail()))
+    case _ => None
+  }
+
+  def takeViaFold(n: Int): Stream[A] = unfold((this, n)) {
+    case (_, 0) | (Empty, _) => None
+    case (Cons(head, tail), left) => Some((head(), (tail(), left - 1)))
+    case _ => None
+  }
+
+  def takeWhileViaFold(p: A => Boolean): Stream[A] = unfold(this) {
+    case Empty => None
+    case Cons(head, _) if !p(head()) => None
+    case Cons(head, tail) => Some(head(), tail())
+  }
+
+  def zipWithViaFold[B](other: Stream[B]): Stream[(A, B)] = unfold((this, other)) {
+    case (Empty, _) | (_, Empty) => None
+    case (Cons(thisHead, thisTail), Cons(otherHead, otherTail)) =>
+      Some((thisHead(), otherHead()), (thisTail(), otherTail()))
+    case _ => None
+  }
+
+  def zipAll[B](s2: Stream[B]): Stream[(Option[A], Option[B])] = unfold((this, s2)) {
+    case (Cons(thisHead, thisTail), Cons(otherHead, otherTail)) =>
+      Some((Some(thisHead()), Some(otherHead())), (thisTail(), otherTail()))
+    case (Empty, Cons(s2head, s2Tail)) => Some((None, Some(s2head())), (this, s2Tail()))
+    case (Cons(head, tail), Empty) => Some((Some(head()), None), (tail(), Empty))
+    case _ => None
   }
 }
 

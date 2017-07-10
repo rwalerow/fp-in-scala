@@ -1,6 +1,7 @@
 package rwalerow.chapter5
 
 import org.scalatest.{Matchers, WordSpec}
+import rwalerow.chapter5.Stream.{constant, fibs, unfold}
 
 class StreamSpec extends WordSpec with Matchers {
 
@@ -23,11 +24,15 @@ class StreamSpec extends WordSpec with Matchers {
       "take only requerd number of elements" in {
         val a = Stream(1, 2, 3, 4, 5)
         val taken = a.take(3).toList
+        val viaFold = a.takeViaFold(3).toList
         taken.size shouldBe 3
         taken.last shouldBe 3
+        viaFold.size shouldBe 3
+        viaFold.last shouldBe 3
       }
       "not call untaken elements" in {
         streamWithExceptionAt2nd.take(1).toList shouldBe List(2)
+        streamWithExceptionAt2nd.takeViaFold(1).toList shouldBe List(2)
       }
     }
 
@@ -35,6 +40,7 @@ class StreamSpec extends WordSpec with Matchers {
       "take only even elements" in {
         val a = Stream(2,4,6,8,11,12)
         a.takeWhile(_ % 2 == 0).toList shouldBe List(2,4,6,8)
+        a.takeWhileViaFold(_ % 2 == 0).toList shouldBe List(2,4,6,8)
       }
     }
 
@@ -59,9 +65,11 @@ class StreamSpec extends WordSpec with Matchers {
     "map" should {
       "transform stream into string" in {
         (Stream(1,2,3,4,5) map (_.toString) toList) shouldBe List("1", "2", "3", "4", "5")
+        (Stream(1,2,3,4,5) mapViaFold (_.toString) toList) shouldBe List("1", "2", "3", "4", "5")
       }
       "call should be lazy" in {
         streamWithExceptionAt2nd map (_.toString)
+        streamWithExceptionAt2nd mapViaFold (_.toString)
       }
     }
 
@@ -88,7 +96,7 @@ class StreamSpec extends WordSpec with Matchers {
 
     "constants" should {
       "return infinite 2 list" in {
-        Stream.constant(2).take(10).toList.sum shouldBe 20
+        constant(2).take(10).toList.sum shouldBe 20
       }
     }
 
@@ -104,17 +112,17 @@ class StreamSpec extends WordSpec with Matchers {
 
     "fibs" should {
       "generate proper first 5 elements" in {
-        Stream.fibs.take(5).toList shouldBe List(0, 1, 1, 2, 3)
+        fibs.take(5).toList shouldBe List(0, 1, 1, 2, 3)
       }
 
       "generate proper first 10 elements" in {
-        Stream.fibs.take(10).toList shouldBe List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
+        fibs.take(10).toList shouldBe List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
       }
     }
 
     "unfold" should {
       "generate const stream of elements" in {
-        val result = Stream.unfold(1)(_ => Some(1, 1)).take(10).toList
+        val result = unfold(1)(_ => Some(1, 1)).take(10).toList
 
         result.size shouldBe 10
         result.sum shouldBe 10
@@ -122,13 +130,60 @@ class StreamSpec extends WordSpec with Matchers {
       }
 
       "generate increasing stream" in {
-        val result = Stream.unfold(1)(x => Some(x, x + 10))
+        val result = unfold(1)(x => Some(x, x + 10))
         result.take(5).toList shouldBe List(1, 11, 21, 31, 41)
       }
 
       "terminate stream on None value" in {
-        val result = Stream.unfold(1)(x => if(x < 3) Some(x, x + 1) else None)
+        val result = unfold(1)(x => if(x < 3) Some(x, x + 1) else None)
         result.take(10).toList shouldBe List(1,2)
+      }
+    }
+
+    "zipWith via fold" should {
+      "zip Empty with some" in {
+        val first = Empty
+        val second = constant(10)
+
+        (first zipWithViaFold second).take(10).toList shouldBe Nil
+      }
+      "zip some with empty" in {
+        val first = constant(10)
+        val second = Empty
+
+        (first zipWithViaFold second).take(10).toList shouldBe Nil
+      }
+      "zip 2 inifinite Streams" in {
+        val count = Stream.from(1)
+        val fibsonacci = fibs
+
+        (count zipWithViaFold fibsonacci).take(5).toList shouldBe List(
+          (1, 0), (2, 1), (3, 1), (4, 2), (5, 3)
+        )
+      }
+    }
+
+    "zipAll" should {
+      "zip Empty whith other" in {
+        val f = Empty
+        val s = Stream(1, 2)
+
+        f.zipAll(s).toList shouldBe List(
+          (None, Some(1)), (None, Some(2))
+        )
+
+        s.zipAll(f).toList shouldBe List(
+          (Some(1), None), (Some(2), None)
+        )
+      }
+      
+      "work the same as normal zip for regular zip" in {
+        val f = Stream(1,2,3,4,5,6)
+        val s = Stream(6,5,4,3,2,1)
+
+        val expected = f.zipWithViaFold(s).map{ case(x, y) => (Some(x), Some(y)) }
+
+        f.zipAll(s).toList shouldBe expected.toList
       }
     }
 
