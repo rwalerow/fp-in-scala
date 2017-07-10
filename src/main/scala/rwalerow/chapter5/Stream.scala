@@ -73,6 +73,10 @@ object Stream {
 
   def from(n: Int): Stream[Int] = cons(n, from(n + 1))
 
+  def fibs: Stream[Int] = fibsFrom(0, 1)
+
+  def fibsFrom(first: Int, second: Int): Stream[Int] = cons(first, fibsFrom(second, first + second))
+
   def empty[A]: Stream[A] = Empty
 
   /**

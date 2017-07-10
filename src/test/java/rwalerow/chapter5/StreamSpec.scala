@@ -101,6 +101,16 @@ class StreamSpec extends WordSpec with Matchers {
         Stream.from(1).take(10).toList.sum shouldBe 55
       }
     }
+
+    "fibs" should {
+      "generate proper first 5 elements" in {
+        Stream.fibs.take(5).toList shouldBe List(0, 1, 1, 2, 3)
+      }
+
+      "generate proper first 10 elements" in {
+        Stream.fibs.take(10).toList shouldBe List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
+      }
+    }
   }
 
 }
