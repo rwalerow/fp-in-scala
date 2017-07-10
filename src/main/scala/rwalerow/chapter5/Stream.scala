@@ -79,6 +79,11 @@ object Stream {
 
   def empty[A]: Stream[A] = Empty
 
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = f(z) match {
+    case Some((a, s)) => cons(a, unfold(s)(f))
+    case None => empty
+  }
+
   /**
     *
     * I do believe that this method(which is listed in the book)

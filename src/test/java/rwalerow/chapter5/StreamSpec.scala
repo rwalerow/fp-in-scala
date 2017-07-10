@@ -111,6 +111,28 @@ class StreamSpec extends WordSpec with Matchers {
         Stream.fibs.take(10).toList shouldBe List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
       }
     }
+
+    "unfold" should {
+      "generate const stream of elements" in {
+        val result = Stream.unfold(1)(_ => Some(1, 1)).take(10).toList
+
+        result.size shouldBe 10
+        result.sum shouldBe 10
+        result.product shouldBe 1
+      }
+
+      "generate increasing stream" in {
+        val result = Stream.unfold(1)(x => Some(x, x + 10))
+        result.take(5).toList shouldBe List(1, 11, 21, 31, 41)
+      }
+
+      "terminate stream on None value" in {
+        val result = Stream.unfold(1)(x => if(x < 3) Some(x, x + 1) else None)
+        result.take(10).toList shouldBe List(1,2)
+      }
+    }
+
+
   }
 
 }
