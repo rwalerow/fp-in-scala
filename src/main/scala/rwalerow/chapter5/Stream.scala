@@ -91,6 +91,13 @@ trait Stream[+A] {
     case e@Cons(_, tail) => Some((e, tail()))
     case _ => None
   }
+
+  def tailsViaScanRight: Stream[Stream[A]] = scanRight(Empty: Stream[A])((elem, acc) => Cons(() => elem, () => acc))
+
+  def scanRight[B](default: B)(f: (A, => B) => B): Stream[B] = unfold(this) {
+    case e@Cons(head, tails) => Some((e.foldRight(default)(f), tails()))
+    case _ => None
+  }
 }
 
 case object Empty extends Stream[Nothing] {
