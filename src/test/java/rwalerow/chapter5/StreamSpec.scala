@@ -176,7 +176,7 @@ class StreamSpec extends WordSpec with Matchers {
           (Some(1), None), (Some(2), None)
         )
       }
-      
+
       "work the same as normal zip for regular zip" in {
         val f = Stream(1,2,3,4,5,6)
         val s = Stream(6,5,4,3,2,1)
@@ -187,6 +187,20 @@ class StreamSpec extends WordSpec with Matchers {
       }
     }
 
+    "startWith" should {
+      "return false on longer start string" in {
+        Stream(1,2,3,4).startWith(Stream(1,2,3,4,5,6,7)) shouldBe false
+      }
+
+      "return false on invalid substring" in {
+        Stream(1,2,3,4,5,6,7).startWith(Stream(1,2,3,4,3)) shouldBe false
+      }
+
+      "detect proper substring" in {
+        Stream.from(1).take(99).startWith(Stream.from(1).take(98)) shouldBe true
+      }
+
+    }
 
   }
 
