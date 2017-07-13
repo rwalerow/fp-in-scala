@@ -202,6 +202,14 @@ class StreamSpec extends WordSpec with Matchers {
 
     }
 
+    "tails" should {
+      "Find all tails of Stream(1,2,3,4)" in {
+        Stream(1,2,3,4).tails.map(_.toList).toList shouldBe List(
+          List(1,2,3,4), List(2,3,4), List(3,4), List(4)
+        )
+      }
+    }
+
   }
 
 }
