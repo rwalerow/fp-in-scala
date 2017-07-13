@@ -1,7 +1,5 @@
 package rwalerow.chapter5
 
-import rwalerow.chapter5.Stream.{cons, empty}
-
 trait Stream[+A] {
   import Stream._
 
