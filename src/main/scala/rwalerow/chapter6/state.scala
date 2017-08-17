@@ -76,5 +76,29 @@ object RNG {
       val (b, rngb) = rb(rnga)
       (f(a, b), rngb)
     }
+
+  def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] =
+    map2(ra, rb)((_, _))
+
+  val randIntDouble: Rand[(Int, Double)] =
+    both(int, double)
+
+  val randDoubleInt: Rand[(Double, Int)] =
+    both(double, int)
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+    fs.foldRight(unit(List()): Rand[List[A]])((acc, nextRand) => map2(acc, nextRand)(_ :: _))
+
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] =  rng =>
+    f(rng) match {
+      case (valA, rng2) => g(valA)(rng2)
+    }
+
+  def nonNegativeLessThan(n: Int): Rand[Int] = { rng =>
+    val (i, rng2) = nonNegativeInt(rng)
+    val mod = i % n
+    if( i + (n-1) - mod >= 0) (mod, rng2)
+    else nonNegativeLessThan(n)(rng)
+  }
 }
 
