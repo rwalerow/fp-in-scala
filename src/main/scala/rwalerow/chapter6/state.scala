@@ -98,7 +98,12 @@ object RNG {
     val (i, rng2) = nonNegativeInt(rng)
     val mod = i % n
     if( i + (n-1) - mod >= 0) (mod, rng2)
-    else nonNegativeLessThan(n)(rng)
+    else nonNegativeLessThan(-n)(rng)
   }
-}
 
+  def mapViaFlatMap[A, B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(a => unit(f(a)))
+
+  def map2ViaFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra)(a => flatMap(rb)(b => unit(f(a, b))))
+}
