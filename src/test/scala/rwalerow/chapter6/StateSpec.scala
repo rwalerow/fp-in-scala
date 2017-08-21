@@ -31,4 +31,23 @@ class StateSpec extends WordSpec with Matchers {
     }
   }
 
+  "State" should {
+    "map" in {
+      val a: State[Unit, Int] = State(s => (10, s))
+      a.map(_ + 15).run(()) shouldBe (25, ())
+    }
+
+    "map2" in {
+      val a: State[Unit, Int] = State(s => (10, s))
+      val b: State[Unit, Int] = State(s => (33, s))
+
+      a.map2(b)((va, vb) => (va - 1) * (vb - 30)).run() shouldBe (27, ())
+    }
+
+    "flatMap" in {
+      val a: State[Unit, Int] = State(s => (10, s))
+      a.flatMap(valA => State(s => (valA.toString, s))).run(()) shouldBe ("10", ())
+    }
+  }
+
 }

@@ -4,7 +4,6 @@ trait RNG {
   def nextInt: (Int, RNG)
 }
 
-
 object RNG {
   case class SimpleRNG(seed: Long) extends RNG {
     def nextInt: (Int, RNG) = {
@@ -98,7 +97,7 @@ object RNG {
     val (i, rng2) = nonNegativeInt(rng)
     val mod = i % n
     if( i + (n-1) - mod >= 0) (mod, rng2)
-    else nonNegativeLessThan(-n)(rng)
+    else nonNegativeLessThan(n)(rng)
   }
 
   def mapViaFlatMap[A, B](s: Rand[A])(f: A => B): Rand[B] =
@@ -106,4 +105,33 @@ object RNG {
 
   def map2ViaFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
     flatMap(ra)(a => flatMap(rb)(b => unit(f(a, b))))
+}
+
+case class State[S,+A](run: S => (A, S)) {
+
+  def map[B](f: A => B): State[S, B] = State(
+    state => run(state) match {
+      case (a, s) => (f(a), s)
+    }
+  )
+
+  def map2[B, C](sc: State[S, B])(f: (A, B) => C): State[S, C] = State(
+    state => run(state) match {
+      case (va, sa) => sc.run(sa) match {
+        case (vb, sb) => (f(va, vb), sb)
+      }
+    }
+  )
+
+  def flatMap[B](f: A => State[S, B]): State[S, B] = State(
+    state => run(state) match {
+      case (va, sa) => f(va).run(sa)
+    }
+  )
+}
+
+object State {
+  type Rand[A] = State[RNG, A]
+
+  def sequence[S, A](l: List[State[S, A]]): State[S, List[A]] = ???
 }
