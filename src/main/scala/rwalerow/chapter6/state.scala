@@ -133,5 +133,24 @@ case class State[S,+A](run: S => (A, S)) {
 object State {
   type Rand[A] = State[RNG, A]
 
-  def sequence[S, A](l: List[State[S, A]]): State[S, List[A]] = ???
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = State(
+    state => {
+      val result = inputs.foldLeft(state)(applyToMachine)
+      ((result.coins, result.candies), result)
+    }
+  )
+
+  private def applyToMachine(machine: Machine, input: Input): Machine = (machine, input) match {
+    case (Machine(_, c, _), _) if c <= 0 => machine
+    case (Machine(true, _, _), Turn) | (Machine(false, _, _), Coin) => machine
+    case (Machine(true, candies, coins), Coin) if candies > 0 => Machine(false, candies, coins + 1)
+    case (Machine(false, candies, coins), Turn) => Machine(true, candies - 1, coins)
+    case _ => machine
+  }
 }
+
+sealed trait Input
+case object Coin extends Input
+case object Turn extends Input
+
+case class Machine(locked: Boolean, candies: Int, coins: Int)

@@ -50,4 +50,57 @@ class StateSpec extends WordSpec with Matchers {
     }
   }
 
+  "Machine" should {
+    "work for example 1" in {
+      val init = Machine(
+        locked = true,
+        candies = 5,
+        coins = 5
+      )
+      val inputs = List(Coin, Turn, Coin, Turn, Coin, Turn, Coin, Turn)
+
+      State.simulateMachine(inputs).run(init) shouldBe ((9, 1), Machine(
+        locked = true, candies = 1, coins = 9
+      ))
+    }
+
+    "do nothing on no candies" in {
+      val init = Machine(
+        locked = true,
+        candies = 0,
+        coins = 5
+      )
+      val inputs = List(Coin, Turn, Coin, Turn, Coin, Turn, Coin, Turn)
+      State.simulateMachine(inputs).run(init) shouldBe ((5,0), init)
+    }
+
+    "work until candies are finished" in {
+      val init = Machine(
+        locked = true,
+        candies = 1,
+        coins = 5
+      )
+      val inputs = List(Coin, Turn, Coin, Turn, Coin, Turn, Coin, Turn)
+      State.simulateMachine(inputs).run(init) shouldBe ((6,0), Machine(true, 0, 6))
+    }
+
+    "do nothing when coin inserted to unlock" in {
+      val init = Machine(
+        locked = false,
+        candies = 1,
+        coins = 5
+      )
+      State.simulateMachine(List(Coin)).run(init) shouldBe ((5,1), init)
+    }
+
+    "do nothing when turned on locked" in {
+      val init = Machine(
+        locked = true,
+        candies = 1,
+        coins = 5
+      )
+      State.simulateMachine(List(Turn)).run(init) shouldBe ((5,1), init)
+    }
+  }
+
 }
